@@ -1,4 +1,3 @@
-# aws-ec2-to-ecs-migration
 # AWS EC2 to ECS Migration
 
 A hands-on DevOps project demonstrating the migration of a legacy application running on a single Amazon EC2 instance to a modern, containerised **Amazon ECS Fargate** architecture.
