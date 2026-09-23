@@ -114,7 +114,7 @@ resource "aws_nat_gateway" "main" {
   subnet_id     = aws_subnet.public_1.id
 
   tags = {
-    Name = "NAT gw"
+    Name = "${var.project_name}-nat-gateway"
   }
 
   # To ensure proper ordering, it is recommended to add an explicit dependency
