@@ -51,3 +51,14 @@ variable "environment" {
 #   type        = map(string)
 #   default     = {}
 # }
+
+# variable "vpc_id" {
+#   type        = string
+#   description = "The ID of the target AWS VPC"
+#   default = "aws_vpc.main.id"
+# }
+variable "container_port" {
+  description = "The port the application listens on inside and outside the container"
+  type        = number
+  default     = 5000
+}
