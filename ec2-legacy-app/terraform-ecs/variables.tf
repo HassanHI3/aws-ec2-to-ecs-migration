@@ -1,64 +1,53 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "eu-west-2"
 }
 
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "legacy-api"
 }
 
 variable "environment" {
   description = "Environment name"
   type        = string
-  default     = "production"
+}
+variable "container_image" {
+  description = "Docker image for the application"
+  type        = string
 }
 
-# variable "instance_type" {
-#   description = "EC2 instance type"
-#   type        = string
-#   default     = "t3.micro"
-# }
-
-# variable "key_pair_name" {
-#   description = "AWS Key Pair name for SSH access"
-#   type        = string
-#   default     = ""
-# }
-
-# variable "allowed_cidr_blocks" {
-#   description = "CIDR blocks allowed to access the application"
-#   type        = list(string)
-#   default     = ["0.0.0.0/0"]
-# }
-
-# variable "domain_name" {
-#   description = "Domain name for Route53 record (optional)"
-#   type        = string
-#   default     = ""
-# }
-
-# variable "route53_zone_id" {
-#   description = "Route53 hosted zone ID (optional)"
-#   type        = string
-#   default     = ""
-# }
-
-# variable "tags" {
-#   description = "Tags to apply to resources"
-#   type        = map(string)
-#   default     = {}
-# }
-
-# variable "vpc_id" {
-#   type        = string
-#   description = "The ID of the target AWS VPC"
-#   default = "aws_vpc.main.id"
-# }
 variable "container_port" {
   description = "The port the application listens on inside and outside the container"
   type        = number
-  default     = 5000
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "public_subnet_1_cidr" {
+  description = "CIDR block for public subnet 1"
+  type        = string
+}
+
+variable "public_subnet_2_cidr" {
+  description = "CIDR block for public subnet 2"
+  type        = string
+}
+
+variable "ecs_cpu" {
+  description = "CPU units allocated to the ECS Fargate task"
+  type        = number
+}
+
+variable "ecs_memory" {
+  description = "Memory in MiB allocated to the ECS Fargate task"
+  type        = number
+}
+
+variable "desired_count" {
+  description = "Number of ECS tasks the service should run"
+  type        = number
 }

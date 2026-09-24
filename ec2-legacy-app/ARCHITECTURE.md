@@ -255,7 +255,7 @@ After migration, the architecture will be:
 
 ## Migration Strategy
 
-Students should plan:
+you should plan:
 
 1. **Containerization**: Create Dockerfile for Flask app
 2. **ECS Infrastructure**: Terraform for ECS cluster, service, ALB

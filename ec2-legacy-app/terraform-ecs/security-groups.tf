@@ -51,8 +51,8 @@ resource "aws_security_group" "ecs_sg" {
 resource "aws_vpc_security_group_ingress_rule" "allow_alb_traffic" {
   security_group_id            = aws_security_group.ecs_sg.id
   referenced_security_group_id = aws_security_group.alb_sg.id # Ties ECS directly to your ALB SG
-  from_port                    = 5000
-  to_port                      = 5000
+  from_port                    = var.container_port
+  to_port                      = var.container_port
   ip_protocol                  = "tcp"
 }
 
