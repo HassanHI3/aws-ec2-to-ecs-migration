@@ -12,7 +12,7 @@ resource "aws_ecr_repository" "ec2_legacy_app" { # existing ecr repo imported an
   }
 }
 
-resource "aws_ecr_lifecycle_policy" "ec2_legacy_app_lifecycle" {
+resource "aws_ecr_lifecycle_policy" "legacy_app" {
   repository = aws_ecr_repository.ec2_legacy_app.name
 
   policy = <<EOF
