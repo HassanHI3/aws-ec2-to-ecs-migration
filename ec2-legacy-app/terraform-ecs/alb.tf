@@ -1,7 +1,7 @@
 # Application Load balancer
 
 resource "aws_lb" "main" {
-  name               = "${var.project_name}-${var.environment}-alb"
+  name               = "ecs-migration-${var.environment}-alb"
   internal           = false # Public / Internet-facing
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -17,7 +17,7 @@ resource "aws_lb" "main" {
 # 3. ALB TARGET GROUP (Where ECS tasks register)
 
 resource "aws_lb_target_group" "ecs_target_group" {
-  name        = "${var.project_name}-${var.environment}-ecs-tg"
+  name        = "ecs-migration-${var.environment}-ecs-tg"
   port        = var.container_port # port inside my container which is 5000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
