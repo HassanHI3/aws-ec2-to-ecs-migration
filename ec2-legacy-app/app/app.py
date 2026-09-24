@@ -34,6 +34,10 @@ products_db = {
 orders_db = []
 order_counter = 1
 
+@app.route('/')
+def home():
+    return [f"Welcome to {APP_NAME} v{APP_VERSION} running in {ENVIRONMENT} environment!"], 200
+
 
 @app.route('/health', methods=['GET'])
 def health():
