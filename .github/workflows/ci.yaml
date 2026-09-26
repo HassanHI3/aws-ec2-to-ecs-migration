@@ -1,0 +1,67 @@
+name: CI Workflow
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: ec2-legacy-app/app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: start the application
+        working-directory: ec2-legacy-app/app
+        run: |
+          gunicorn --bind 0.0.0.0:5000 wsgi:app & sleep 5
+
+      - name: Test health endpoint
+        working-directory: ec2-legacy-app/app
+        run: |
+          curl --fail http://localhost:5000/health
+
+      - name: Build Docker image
+        working-directory: ec2-legacy-app/app
+        run: |
+          docker build -t ec2-legacy-app:latest .
+
+      # - name: Use image output
+      #   working-directory: ec2-legacy-app/app
+      #   run: |
+      #       echo "The built image is ecs-legacy-app:latest"
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: 'ec2-legacy-app:latest'
+          format: 'sarif'
+          exit-code: '1' # stops thwe workflow
+          severity: 'CRITICAL,HIGH' # might fail here and can change it to medium if you want to see all vulnerabilities
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+
