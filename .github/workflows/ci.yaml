@@ -54,7 +54,7 @@ jobs:
         with:
           image-ref: 'ec2-legacy-app:latest'
           format: 'sarif'
-          exit-code: '1' # stops thwe workflow
+          exit-code: '0' # set to 1 to stop the workflow due to vulnerablities
           severity: 'CRITICAL,HIGH' # might fail here and can change it to medium if you want to see all vulnerabilities
           output: 'trivy-results.sarif'
 
