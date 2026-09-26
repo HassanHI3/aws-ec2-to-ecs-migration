@@ -50,7 +50,7 @@ jobs:
       #       echo "The built image is ecs-legacy-app:latest"
 
       - name: Run Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: 'ec2-legacy-app:latest'
           format: 'sarif'
