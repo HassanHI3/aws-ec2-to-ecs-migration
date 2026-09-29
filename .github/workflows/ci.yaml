@@ -39,10 +39,10 @@ jobs:
         run: |
           curl --fail http://localhost:5000/health
 
-      - name: Build Docker image
+      - name: Build Docker image # using commit sha here to make the image distinct
         working-directory: ec2-legacy-app/app
         run: |
-          docker build -t ec2-legacy-app:latest .
+          docker build -t ec2-legacy-app:${{ github.sha }} .
 
       # - name: Use image output
       #   working-directory: ec2-legacy-app/app
@@ -52,7 +52,7 @@ jobs:
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.35.0
         with:
-          image-ref: 'ec2-legacy-app:latest'
+          image-ref: 'ec2-legacy-app:${{ github.sha }}'
           format: 'sarif'
           exit-code: '0' # set to 1 to stop the workflow due to vulnerablities
           severity: 'CRITICAL,HIGH' # might fail here and can change it to medium if you want to see all vulnerabilities
@@ -64,4 +64,17 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
+      - name: Terraform Init
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform init -backend=false # initialize terraform without backend configuration to avoid errors in CI/CD
+
+      - name: Terraform fmt
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform fmt -check # formatting without making changes in code
+
+      - name: Terraform validate
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform validate
