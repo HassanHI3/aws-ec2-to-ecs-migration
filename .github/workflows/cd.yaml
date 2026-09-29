@@ -7,60 +7,64 @@ permissions:
   id-token: write
   contents: read
 
-  jobs:
-    deploy:
-      runs-on: ubuntu-latest
-      environment: Production
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-        - name: OpenID Connect
-          uses: aws-actions/configure-aws-credentials@v2
-          with:
-            role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-            aws-region: eu-west-2
-            audience: sts.amazonaws.com # tells AWS that this is an OIDC request
+      - name: OpenID Connect
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+          audience: sts.amazonaws.com # tells AWS that this is an OIDC request
 
-        - name: Login to Amazon ECR
-          uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v3 # Set up Docker Buildx so docker/build-push-action@v2 can be used.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3 # Set up Docker Buildx so docker/build-push-action@v2 can be used.
 
-        - name: Build and push Docker image
-          uses: docker/build-push-action@v2
-          with:
-            context: ./ec2-legacy-app/app
-            platforms: linux/arm64
-            push: true # using the sha tag so ecs can deploy a specific immutable version that we can track which commit is running.
-            tags: |
-              ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:latest
-              ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ github.sha }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./ec2-legacy-app/app
+          platforms: linux/arm64
+          push: true # using the sha tag so ecs can deploy a specific immutable version that we can track which commit is running.
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:latest
+            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ github.sha }}
 
-        - name: Terraform Init
-          working-directory: ec2-legacy-app/terraform-ecs
-          run: terraform init
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v2
 
-        - name: Terraform format
-          working-directory: ec2-legacy-app/terraform-ecs
-          run: terraform fmt -check # formatting without making changes in code
+      - name: Terraform Init
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform init
 
-        - name: Terraform Plan
-          working-directory: ec2-legacy-app/terraform-ecs
-          run: terraform plan -out=tfplan
+      - name: Terraform format
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform fmt -check # formatting without making changes in code
 
-        - name: Terraform Apply
-          working-directory: ec2-legacy-app/terraform-ecs
-          run: terraform apply -auto-approve tfplan # auto approve so that worklfow can run w/out manual intervention.
-          # In production, i will remove this and approve manually.
+      - name: Terraform Plan
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform plan -out=tfplan
 
-        - name: Trigger ECS Service Deployment
-          run: |
-            aws --version
-            aws ecs update-service \
-              --cluster ec2-to-ecs-migration-production-cluster \
-              --service ec2-to-ecs-migration-production-service \
-              --force-new-deployment \
-              --region eu-west-2
+      - name: Terraform Apply
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform apply -auto-approve tfplan # auto approve so that worklfow can run w/out manual intervention.
+        # In production, i will remove this and approve manually.
+
+      - name: Trigger ECS Service Deployment
+        run: |
+          aws --version
+          aws ecs update-service \
+            --cluster ec2-to-ecs-migration-production-cluster \
+            --service ec2-to-ecs-migration-production-service \
+            --force-new-deployment \
+            --region eu-west-2
