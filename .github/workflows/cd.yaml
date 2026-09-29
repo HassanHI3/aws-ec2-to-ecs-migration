@@ -37,3 +37,28 @@ permissions:
             ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:latest
             ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ github.sha }}
 
+      - name: Terraform Init
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform init
+
+      - name: Terraform format
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform fmt -check # formatting without making changes in code
+
+      - name: Terraform Plan
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform apply -auto-approve tfplan # auto approve so that worklfow can run w/out manual intervention.
+        # In production, i will remove this and approve manually.
+
+      - name: Trigger ECS Service Deployment
+        run: |
+          aws --version
+          aws ecs update-service \
+            --cluster ec2-to-ecs-migration-production-cluster \
+            --service ec2-to-ecs-migration-production-service \
+            --force-new-deployment \
+            --region eu-west-2
