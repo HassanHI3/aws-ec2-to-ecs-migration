@@ -15,11 +15,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production
-    if: ${{ gitea.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Confirm checkout
         run: echo "Checking out code for CD workflow"
 
       - name: OpenID Connect
