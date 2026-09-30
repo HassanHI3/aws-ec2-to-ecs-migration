@@ -21,7 +21,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::891377356090:role/cicd-assume-role-ec2-ecs
           aws-region: eu-west-2
-          audience: sts.amazonaws.com # tells AWS that this is an OIDC request
 
       - name: Test AWS Authentication
         run: |
