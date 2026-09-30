@@ -2,6 +2,9 @@ name: CD Workflow
 
 on:
   workflow_dispatch:
+  workflows: ["CI Workflow"]
+    types:
+      - completed
 
 permissions:
   id-token: write
@@ -11,10 +14,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production
+    if: ${{ gitea.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        run: echo "Checking out code for CD workflow"
 
       - name: OpenID Connect
         uses: aws-actions/configure-aws-credentials@v4
