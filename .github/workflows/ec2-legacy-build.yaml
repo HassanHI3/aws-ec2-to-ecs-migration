@@ -3,6 +3,7 @@ name: Build EC2 Legacy App
 on: workflow_dispatch
 
 permissions:
+  id-token: write
   contents: read
   security-events: write
 
