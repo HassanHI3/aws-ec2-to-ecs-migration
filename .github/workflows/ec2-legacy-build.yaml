@@ -1,4 +1,5 @@
-name: EC2 Legacy App Build stage
+name: Build EC2 Legacy App
+
 on: workflow_dispatch
 
 permissions:
@@ -19,7 +20,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-2
-          audience: sts.amazonaws.com # tells AWS that this is an OIDC request
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v2

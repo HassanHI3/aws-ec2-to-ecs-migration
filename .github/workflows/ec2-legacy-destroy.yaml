@@ -1,4 +1,4 @@
-name: Destroy EC2 Legacy App Terraform Resources
+name: Destroy EC2 Legacy App
 on: workflow_dispatch
 
 permissions:
