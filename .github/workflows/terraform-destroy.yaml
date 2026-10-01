@@ -25,13 +25,13 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
-        working-directory: ec2-legacy-app/terraform-ecs
+        working-directory: ec2-legacy-app/terraform
         run: terraform init
 
       - name: Terraform Validate
-        working-directory: ec2-legacy-app/terraform-ecs
+        working-directory: ec2-legacy-app/terraform
         run: terraform validate # validating so we don't accidentally destroy resources.
 
       - name: Terraform Destroy
-        working-directory: ec2-legacy-app/terraform-ecs
+        working-directory: ec2-legacy-app/terraform
         run: terraform destroy -auto-approve
