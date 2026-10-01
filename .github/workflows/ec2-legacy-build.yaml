@@ -1,0 +1,42 @@
+name: EC2 Legacy App Build stage
+on: workflow_dispatch
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: OpenID Connect
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+          audience: sts.amazonaws.com # tells AWS that this is an OIDC request
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: ec2-legacy-app/terraform
+        run: terraform init
+
+      - name: Terraform format
+        working-directory: ec2-legacy-app/terraform
+        run: terraform fmt -check # formatting without making changes in code
+
+      - name: Terraform Plan
+        working-directory: ec2-legacy-app/terraform
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ec2-legacy-app/terraform
+        run: terraform apply -auto-approve tfplan # auto approve so that workflow can run w/out manual intervention.
+        # In production, i will remove this and approve manually.
