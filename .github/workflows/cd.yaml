@@ -27,7 +27,7 @@ jobs:
       - name: OpenID Connect
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::891377356090:role/cicd-assume-role-ec2-ecs
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: Test AWS Authentication
