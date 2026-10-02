@@ -33,6 +33,15 @@ output "application_url" {
   value       = var.domain_name != "" ? "http://${var.domain_name}" : "http://${aws_eip.app.public_ip}"
 }
 
+variable "alb_dns_name" {
+  type    = string
+  default = ""
+}
+
+variable "alb_zone_id" {
+  type    = string
+  default = ""
+}
 output "security_group_id" {
   description = "EC2 Security Group ID"
   value       = aws_security_group.ec2.id
