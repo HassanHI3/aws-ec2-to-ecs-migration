@@ -1,11 +1,10 @@
-# Data source for latest Amazon Linux 2023 AMI
-data "aws_ami" "amazon_linux" {
+data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
@@ -272,7 +271,7 @@ echo "Application setup completed at $(date)" >> /var/log/user-data.log
 
 # EC2 Instance
 resource "aws_instance" "app" {
-  ami                    = data.aws_ami.amazon_linux.id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.ec2.id]
@@ -316,6 +315,14 @@ resource "aws_route53_record" "app" {
   name    = var.domain_name
   type    = "A"
 
+  # this is commented out due to directing domain to the ecs alb instead of the ec2 instance
   records = [aws_eip.app.public_ip]
-  ttl     = 300 # 5 minutes TTL for easy cutover
+  ttl     = 60 # 1 minute TTL for faster cutover / # ttl     = 300 # 5 minutes TTL for easy cutover
 }
+
+# alias {
+#   name                   = var.alb_dns_name
+#   zone_id                = var.alb_zone_id
+#   evaluate_target_health = true
+#   }
+# }
