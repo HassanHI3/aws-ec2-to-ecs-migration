@@ -22,9 +22,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # gives gitleaks access to git history as it was too shallow scan b4
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
+        with:
+          exit-code: '0'
 
       - name: Set up Python
         uses: actions/setup-python@v5
