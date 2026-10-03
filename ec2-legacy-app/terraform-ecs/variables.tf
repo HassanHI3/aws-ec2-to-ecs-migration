@@ -52,3 +52,13 @@ variable "desired_count" {
   description = "Number of ECS tasks the service should run"
   type        = number
 }
+
+variable "domain_name" {
+  description = "Domain name for Route53 record (optional)"
+  type        = string
+}
+
+variable "route53_zone_id" {
+  description = "Route53 hosted zone ID (optional)"
+  type        = string
+}
