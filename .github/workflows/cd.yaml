@@ -99,4 +99,4 @@ jobs:
 
       - name: Smoke test
         run: |
-          curl --fail https://ec2-legacy-app.hassanibrahim.com/health
+          curl --fail http://api.legacy-api-demo.co.uk/health
