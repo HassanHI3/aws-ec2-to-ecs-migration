@@ -308,7 +308,7 @@ resource "aws_eip" "app" {
   }
 }
 
-# Route53 Record (for easy cutover to ALB later)
+# Route53 Record pointing at to elastic ip / alb option (for easy cutover to ALB later) / (for rollback to EC2 if needed)
 
 # resource "aws_route53_record" "app" {
 #   count   = var.domain_name != "" && var.route53_zone_id != "" ? 1 : 0
@@ -316,10 +316,13 @@ resource "aws_eip" "app" {
 #   name    = var.domain_name
 #   type    = "A"
 
-  # this is commented out due to directing domain to the ecs alb instead of the ec2 instance
+# Cutover has now happened and this block is no longer needed but can be used for rollback.
+
   # records = [aws_eip.app.public_ip]
   # ttl     = 60 # 1 minute TTL for faster cutover / # ttl     = 300 # 5 minutes TTL for easy cutover
   # }
+
+# This is commented out due to directing domain to the ecs alb instead of the ec2 instance
 
 #   alias {
 #     name                   = var.alb_dns_name
