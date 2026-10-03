@@ -85,16 +85,16 @@ jobs:
         run: |
           aws --version
           aws ecs update-service \
-            --cluster ec2-to-ecs-migration-production-cluster \
-            --service ec2-to-ecs-migration-production-service \
+            --cluster ec2-to-ecs-migration-cluster \
+            --service ec2-to-ecs-migration-app-service \
             --force-new-deployment \
             --region eu-west-2
 
       - name: Wait for ECS service to stabilise
         run: |
           aws ecs wait services-stable \
-            --cluster ec2-to-ecs-migration-production-cluster \
-            --services ec2-to-ecs-migration-production-service \
+            --cluster ec2-to-ecs-migration-cluster \
+            --services ec2-to-ecs-migration-app-service \
             --region eu-west-2
 
       - name: Smoke test
