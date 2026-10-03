@@ -318,9 +318,9 @@ resource "aws_eip" "app" {
 
 # Cutover has now happened and this block is no longer needed but can be used for rollback.
 
-  # records = [aws_eip.app.public_ip]
-  # ttl     = 60 # 1 minute TTL for faster cutover / # ttl     = 300 # 5 minutes TTL for easy cutover
-  # }
+# records = [aws_eip.app.public_ip]
+# ttl     = 60 # 1 minute TTL for faster cutover / # ttl     = 300 # 5 minutes TTL for easy cutover
+# }
 
 # This is commented out due to directing domain to the ecs alb instead of the ec2 instance
 
