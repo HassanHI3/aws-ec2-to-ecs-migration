@@ -7,6 +7,9 @@ on:
     types:
       - completed
 
+env:
+  DEPLOY_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+
 permissions:
   id-token: write
   contents: read
@@ -20,9 +23,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - name: Confirm checkout
-        run: echo "Checking out code for CD workflow"
+        run: |
+          echo "Checking out code and commit ${DEPLOY_SHA} for CD workflow"
 
       - name: OpenID Connect
         uses: aws-actions/configure-aws-credentials@v4
@@ -36,23 +42,22 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3 # Set up Docker Buildx so docker/build-push-action@v2 can be used.
+        uses: docker/setup-buildx-action@v3 # Set up Docker Buildx for multi-platform image builds.
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: ./ec2-legacy-app/app
           platforms: linux/arm64
           push: true # using the sha tag so ecs can deploy a specific immutable version that we can track which commit is running.
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:latest
-            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ github.sha }}
-
+            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         working-directory: ec2-legacy-app/terraform-ecs
@@ -79,3 +84,14 @@ jobs:
             --service ec2-to-ecs-migration-production-service \
             --force-new-deployment \
             --region eu-west-2
+
+      - name: Wait for ECS service to stabilise
+        run: |
+          aws ecs wait services-stable \
+            --cluster ec2-to-ecs-migration-production-cluster \
+            --services ec2-to-ecs-migration-production-service \
+            --region eu-west-2
+
+      - name: Smoke test
+        run: |
+          curl --fail https://ec2-legacy-app.hassanibrahim.com/health
