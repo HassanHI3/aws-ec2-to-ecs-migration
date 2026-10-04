@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "ec2_legacy_app" { # existing ecr repo imported and has the name "ec2-legacy-app"
   name                 = "ec2-legacy-app"
-  image_tag_mutability = "MUTABLE" # Allow image tags to be overwritten but in production use IMMUTABLE for better security and traceability
+  image_tag_mutability = "IMMUTABLE" # IMMUTABLE for better security and traceability
 
   image_scanning_configuration {
     scan_on_push = true
