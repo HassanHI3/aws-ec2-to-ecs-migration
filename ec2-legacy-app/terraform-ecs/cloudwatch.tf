@@ -141,9 +141,12 @@ resource "aws_cloudwatch_metric_alarm" "low_ecs_running_tasks" {
   ]
 }
 
+resource "aws_s3_bucket" "vpc_flow_logs" {
+  bucket = "${var.project_name}-${var.environment}-vpc-flow-logs"
+}
 resource "aws_flow_log" "main" {
-  iam_role_arn    = aws_iam_role.vpc_flow_logs.arn
-  log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
-  traffic_type    = "ALL"
-  vpc_id          = aws_vpc.main.id
+  log_destination      = aws_s3_bucket.vpc_flow_logs.arn
+  log_destination_type = "s3"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.main.id
 }
