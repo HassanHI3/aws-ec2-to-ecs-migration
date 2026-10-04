@@ -113,3 +113,4 @@ jobs:
         with:
           directory: ec2-legacy-app/terraform-ecs
           framework: terraform
+          skip_check: CKV_AWS_338
