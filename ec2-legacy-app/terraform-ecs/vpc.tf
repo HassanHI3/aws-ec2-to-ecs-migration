@@ -13,6 +13,14 @@ resource "aws_vpc" "main" {
   }
 }
 
+# Lock down the default VPC security group - SG auto created with VPC are too permissive so here we lock all traffic in and out.
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  ingress = []
+  egress  = []
+}
+
 # Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
