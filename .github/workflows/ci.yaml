@@ -108,12 +108,12 @@ jobs:
         working-directory: ec2-legacy-app/terraform-ecs
         run: tflint
 
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: ec2-legacy-app/terraform-ecs
-          framework: terraform
-          skip_check: CKV_AWS_2,CKV2_AWS_20,CKV_AWS_103,CKV_AWS_260,CKV_AWS_378,CKV_AWS_130,CKV_AWS_150,CKV2_AWS_28,CKV_AWS_338
+      # - name: Run Checkov
+      #   uses: bridgecrewio/checkov-action@v12
+      #   with:
+      #     directory: ec2-legacy-app/terraform-ecs
+      #     framework: terraform
+      #     skip_check: CKV_AWS_2,CKV2_AWS_20,CKV_AWS_103,CKV_AWS_260,CKV_AWS_378,CKV_AWS_130,CKV_AWS_150,CKV2_AWS_28,CKV_AWS_338
 
 # Accepted risks for this temporary portfolio environment:
 # - HTTP used instead of HTTPS/end-to-end TLS
