@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "cloudwatch_alerts" {
-  name = "${var.project_name}-${var.environment}-alerts"
+  name              = "${var.project_name}-${var.environment}-alerts"
   kms_master_key_id = "alias/aws/sns"
 }
 
