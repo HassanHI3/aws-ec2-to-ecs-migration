@@ -12,6 +12,7 @@ resource "aws_security_group" "alb_sg" {
 # Ingress Rule: Allow HTTP traffic from anywhere
 resource "aws_vpc_security_group_ingress_rule" "allow_http" {
   security_group_id = aws_security_group.alb_sg.id
+  description       = "Allow HTTP traffic from the internet to the ALB"
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 80
   ip_protocol       = "tcp"
@@ -30,6 +31,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http" {
 # Egress Rule: Allow all outbound traffic (Necessary to forward requests to backend instances)
 resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   security_group_id = aws_security_group.alb_sg.id
+  description       = "Allow all outbound traffic from the ALB"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # -1 means all protocols
 }
@@ -50,6 +52,7 @@ resource "aws_security_group" "ecs_sg" {
 # Ingress Rule: Allow traffic ONLY from the ALB's Security Group
 resource "aws_vpc_security_group_ingress_rule" "allow_alb_traffic" {
   security_group_id            = aws_security_group.ecs_sg.id
+  description                  = "Allow traffic from the ALB to ECS tasks"
   referenced_security_group_id = aws_security_group.alb_sg.id # Ties ECS directly to your ALB SG
   from_port                    = var.container_port
   to_port                      = var.container_port
@@ -60,6 +63,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_alb_traffic" {
 # Required for ECS to pull images from ECR, connect to Secrets Manager, or fetch updates
 resource "aws_vpc_security_group_egress_rule" "ecs_allow_all_outbound" {
   security_group_id = aws_security_group.ecs_sg.id
+  description       = "Allow all outbound traffic from ECS tasks"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # -1 means all protocols
 }
