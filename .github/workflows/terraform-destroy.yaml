@@ -1,5 +1,11 @@
 name: Destroy Terraform Resources
-on: workflow_dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "destroy" to confirm'
+        required: true
 
 permissions:
   id-token: write
@@ -7,10 +13,14 @@ permissions:
 
 jobs:
   destroy:
+    if: ${{ github.event.inputs.confirm == 'destroy' }}
     runs-on: ubuntu-latest
     environment: Production
-    steps:
+    defaults:
+      run:
+        working-directory: ec2-legacy-app/terraform-ecs
 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
