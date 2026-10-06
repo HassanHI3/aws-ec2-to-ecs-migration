@@ -34,4 +34,4 @@ jobs:
 
       - name: Terraform Destroy
         working-directory: ec2-legacy-app/terraform
-        run: terraform apply -auto-approve
+        run: terraform destroy -auto-approve
