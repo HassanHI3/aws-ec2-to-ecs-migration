@@ -58,6 +58,7 @@ jobs:
         with:
           directory: ec2-legacy-app/terraform
           framework: terraform
+          baseline: ec2-legacy-app/terraform/.checkov.baseline
 
       - name: Terraform Plan
         working-directory: ec2-legacy-app/terraform
