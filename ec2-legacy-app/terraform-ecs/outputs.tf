@@ -24,7 +24,7 @@ output "ecs_service_name" {
 
 output "ecr_repository_url" {
   description = "URL of the ECR repository"
-  value       = aws_ecr_repository.ec2_legacy_app.repository_url
+  value       = data.aws_ecr_repository.ec2_legacy_app.repository_url
 }
 
 output "vpc_id" {
