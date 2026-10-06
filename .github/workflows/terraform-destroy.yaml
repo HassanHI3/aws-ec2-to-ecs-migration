@@ -43,5 +43,4 @@ jobs:
         run: terraform validate # validating so we don't accidentally destroy resources.
 
       - name: Terraform Destroy
-        working-directory: ec2-legacy-app/terraform-ecs
-        run: terraform destroy -auto-approve
+        run: terraform destroy -auto-approve -input=false -var="container_image=unused"
