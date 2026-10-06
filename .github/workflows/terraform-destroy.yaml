@@ -16,6 +16,9 @@ jobs:
     if: ${{ github.event.inputs.confirm == 'destroy' }}
     runs-on: ubuntu-latest
     environment: Production
+    env:
+      TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
+      TF_VAR_route53_zone_id: ${{ vars.ROUTE53_ZONE_ID }}
     defaults:
       run:
         working-directory: ec2-legacy-app/terraform-ecs
@@ -43,4 +46,6 @@ jobs:
         run: terraform validate # validating so we don't accidentally destroy resources.
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve -input=false -var="container_image=unused"
+        run: |
+          terraform destroy -auto-approve -input=false -var="container_image=unused"
+          echo "Terraform destroy completed successfully."
