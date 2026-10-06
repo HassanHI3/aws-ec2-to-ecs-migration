@@ -205,7 +205,7 @@ resource "aws_s3_object" "app" {
   bucket = aws_s3_bucket.app.id
   key    = "app.zip"
   source = data.archive_file.app.output_path
-  etag   = data.archive_file.app.output_path_md5
+  etag   = data.archive_file.app.output_md5
 }
 
 # S3 bucket policy for EC2 access
