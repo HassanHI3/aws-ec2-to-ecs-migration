@@ -142,7 +142,8 @@ resource "aws_cloudwatch_metric_alarm" "low_ecs_running_tasks" {
 }
 
 resource "aws_s3_bucket" "vpc_flow_logs" {
-  bucket = "${var.project_name}-${var.environment}-vpc-flow-logs"
+  bucket        = "${var.project_name}-${var.environment}-vpc-flow-logs"
+  force_destroy = true
 }
 resource "aws_flow_log" "main" {
   log_destination      = aws_s3_bucket.vpc_flow_logs.arn
