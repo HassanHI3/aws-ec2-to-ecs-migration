@@ -73,7 +73,7 @@ jobs:
         working-directory: ec2-legacy-app/terraform-ecs
         run: |
           terraform plan \
-            -var="container_image=${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}" \
+            -var="container_image=${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}-${{ github.run_number }}" \
             -out=tfplan
 
       - name: Terraform Apply
