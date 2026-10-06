@@ -56,8 +56,7 @@ jobs:
           platforms: linux/arm64
           push: true # using the sha tag so ecs can deploy a specific immutable version that we can track which commit is running.
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:latest
-            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}
+            ${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}-${{ github.run_number }}
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v3
