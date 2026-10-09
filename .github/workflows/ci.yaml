@@ -113,12 +113,3 @@ jobs:
         with:
           directory: ec2-legacy-app/terraform-ecs
           framework: terraform
-          skip_check: CKV_AWS_2,CKV2_AWS_20,CKV_AWS_103,CKV_AWS_260,CKV_AWS_378,CKV_AWS_130,CKV_AWS_150,CKV2_AWS_28,CKV_AWS_338
-
-# Accepted risks for this temporary portfolio environment:
-# - HTTP used instead of HTTPS/end-to-end TLS
-# - Public ALB requires internet-facing HTTP ingress
-# - Public subnets intentionally configured as public
-# - ALB deletion protection disabled to allow terraform destroy
-# - WAF omitted to minimise demo infrastructure cost
-# - CloudWatch retention limited to 7 days to minimise cost
