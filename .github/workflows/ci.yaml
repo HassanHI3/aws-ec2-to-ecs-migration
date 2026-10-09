@@ -109,7 +109,9 @@ jobs:
         run: tflint
 
       - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@master
         with:
           directory: ec2-legacy-app/terraform-ecs
-          framework: terraform
+          skip_check: ${{ vars.CHECKOV_SKIP }}
+          output_format: sarif
+          output_file_path: results.sarif
