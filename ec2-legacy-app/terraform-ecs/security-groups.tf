@@ -19,15 +19,6 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http" {
   to_port           = 80
 }
 
-# Ingress Rule: Allow HTTPS traffic from anywhere (Optional - uncomment if using SSL)
-# resource "aws_vpc_security_group_ingress_rule" "allow_https" {
-#   security_group_id = aws_security_group.alb_sg.id
-#   cidr_ipv4         = "0.0.0.0/0"
-#   from_port         = 443
-#   ip_protocol       = "tcp"
-#   to_port           = 443
-# }
-
 # Egress Rule: Allow all outbound traffic (Necessary to forward requests to backend instances)
 resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   security_group_id = aws_security_group.alb_sg.id
