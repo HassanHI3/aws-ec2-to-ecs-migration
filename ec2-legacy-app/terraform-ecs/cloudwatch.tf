@@ -6,7 +6,7 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
 resource "aws_sns_topic_subscription" "email_alerts" {
   topic_arn = aws_sns_topic.cloudwatch_alerts.arn
   protocol  = "email"
-  endpoint  = "Hassanhi3@icloud.com"
+  endpoint  = var.alert_email
 }
 
 # CloudWatch alarm for high ECS CPU
@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
   alarm_name          = "${var.project_name}-${var.environment}-unhealthy-alb-targets"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
-  metric_name         = "UnHealthyHostCountation"
+  metric_name         = "UnHealthyHostCount"
   namespace           = "AWS/ApplicationELB"
   period              = 60
   statistic           = "Average"
