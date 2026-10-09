@@ -155,3 +155,51 @@ resource "aws_route_table_association" "private_2_assoc" {
   subnet_id      = aws_subnet.private_2.id
   route_table_id = aws_route_table.private.id
 }
+
+resource "aws_s3_bucket" "vpc_flow_logs" {
+  bucket        = "${var.project_name}-${var.environment}-vpc-flow-logs"
+  force_destroy = true
+}
+resource "aws_flow_log" "main" {
+  log_destination      = aws_s3_bucket.vpc_flow_logs.arn
+  log_destination_type = "s3"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.main.id
+}
+
+resource "aws_s3_bucket_versioning" "vpc_flow_logs" {
+  bucket = aws_s3_bucket.vpc_flow_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "vpc_flow_logs" {
+  bucket                  = aws_s3_bucket.vpc_flow_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "vpc_flow_logs" {
+  bucket = aws_s3_bucket.vpc_flow_logs.id
+
+  rule {
+    id     = "expire-flow-logs"
+    status = "Enabled"
+    filter {}
+
+    expiration {
+      days = 30
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = 7
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.vpc_flow_logs]
+}
