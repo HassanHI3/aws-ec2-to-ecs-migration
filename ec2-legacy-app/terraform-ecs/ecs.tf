@@ -17,7 +17,7 @@ resource "aws_ecs_cluster" "main" {
 # Task Definition detailing the container specifications
 
 resource "aws_cloudwatch_log_group" "ecs" {
-  name              = "/ecs/${var.project_name}-${var.environment}"
+  name = "/ecs/${var.project_name}-${var.environment}"
   retention_in_days = 7
 }
 
