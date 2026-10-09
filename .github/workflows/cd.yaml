@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows: ["CI Workflow"]
-    types:
-      - completed
+    types: [completed]
+    branches: [main]
 
 env:
   DEPLOY_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
   TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
   TF_VAR_route53_zone_id: ${{ vars.ROUTE53_ZONE_ID }}
+  TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
 
 permissions:
   id-token: write
