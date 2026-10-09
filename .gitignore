@@ -3,4 +3,3 @@
 *.tfstate.*
 *.tfvars
 **/app.zip
-*.checkov.yaml
