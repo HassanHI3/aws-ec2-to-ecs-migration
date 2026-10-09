@@ -19,6 +19,7 @@ jobs:
     env:
       TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
       TF_VAR_route53_zone_id: ${{ vars.ROUTE53_ZONE_ID }}
+      TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
     defaults:
       run:
         working-directory: ec2-legacy-app/terraform-ecs
