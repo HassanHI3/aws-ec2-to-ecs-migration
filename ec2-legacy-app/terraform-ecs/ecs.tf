@@ -1,5 +1,3 @@
-
-
 # 1. ECS CLUSTER & TASK DEFINITION
 
 # Core ECS Cluster
@@ -57,6 +55,15 @@ resource "aws_ecs_task_definition" "app" {
         }
       ]
 
+      # Container health check - ECS ignores the Dockerfile HEALTHCHECK, so it's defined here too
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${var.container_port}/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 10
+      }
+
       # Sends container logs to CloudWatch
       logConfiguration = {
         logDriver = "awslogs"
@@ -80,7 +87,10 @@ resource "aws_ecs_service" "main" {
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
-
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
   network_configuration {
     subnets          = [aws_subnet.private_1.id, aws_subnet.private_2.id] # Running Fargate tasks in private subnets for security
     security_groups  = [aws_security_group.ecs_sg.id]
