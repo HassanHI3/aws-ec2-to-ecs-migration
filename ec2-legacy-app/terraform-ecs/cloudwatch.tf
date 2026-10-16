@@ -1,12 +1,30 @@
 resource "aws_sns_topic" "cloudwatch_alerts" {
-  name              = "${var.project_name}-${var.environment}-alerts"
-  kms_master_key_id = "alias/aws/sns"
+  name = "${var.project_name}-${var.environment}-alerts"
+  # No kms_master_key_id: the AWS-managed key (alias/aws/sns) blocks CloudWatch alarms
+  # and EventBridge from publishing, so alert emails would never arrive.
 }
 
 resource "aws_sns_topic_subscription" "email_alerts" {
   topic_arn = aws_sns_topic.cloudwatch_alerts.arn
   protocol  = "email"
   endpoint  = var.alert_email
+}
+
+# Allow CloudWatch alarms and EventBridge to publish to the SNS topic
+resource "aws_sns_topic_policy" "alerts" {
+  arn = aws_sns_topic.cloudwatch_alerts.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = ["cloudwatch.amazonaws.com", "events.amazonaws.com"]
+      }
+      Action   = "sns:Publish"
+      Resource = aws_sns_topic.cloudwatch_alerts.arn
+    }]
+  })
 }
 
 # CloudWatch alarm for high ECS CPU
@@ -139,4 +157,23 @@ resource "aws_cloudwatch_metric_alarm" "low_ecs_running_tasks" {
   alarm_actions = [
     aws_sns_topic.cloudwatch_alerts.arn
   ]
+}
+
+# Failed ECS deployment alert - fires when the circuit breaker marks a deployment as failed
+resource "aws_cloudwatch_event_rule" "ecs_deployment_failed" {
+  name = "${var.project_name}-${var.environment}-ecs-deployment-failed"
+
+  event_pattern = jsonencode({
+    source      = ["aws.ecs"]
+    detail-type = ["ECS Deployment State Change"]
+    detail = {
+      eventName = ["SERVICE_DEPLOYMENT_FAILED"]
+    }
+  })
+}
+
+# Sends the failed deployment event to my email via the SNS topic
+resource "aws_cloudwatch_event_target" "ecs_deployment_failed_sns" {
+  rule = aws_cloudwatch_event_rule.ecs_deployment_failed.name
+  arn  = aws_sns_topic.cloudwatch_alerts.arn
 }
