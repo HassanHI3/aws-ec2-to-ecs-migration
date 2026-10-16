@@ -89,12 +89,12 @@ jobs:
           path: ec2-legacy-app/terraform-ecs/tfplan
           retention-days: 1
 
-    # JOB 2 - waits for manual approval, then applies the saved plan
-    apply:
-      name: Apply and verify Terraform Plan
-      needs: plan
-      runs-on: ubuntu-latest
-      environment: Production # this is where the manual approval happens
+  # JOB 2 - waits for manual approval, then applies the saved plan
+  apply:
+    name: Apply and verify Terraform Plan
+    needs: deploy
+    runs-on: ubuntu-latest
+    environment: Production # this is where the manual approval happens
 
     steps:
       - name: Checkout code
