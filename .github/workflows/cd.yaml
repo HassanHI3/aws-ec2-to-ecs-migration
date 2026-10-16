@@ -18,6 +18,7 @@ permissions:
   contents: read
 
 jobs:
+# JOB 1 - build, scan, push and plan (runs automatically)
   deploy:
     runs-on: ubuntu-latest
     environment: Production
@@ -46,6 +47,10 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+      # Required for ARM64 builds on standard x86 GitHub runners
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3 # Set up Docker Buildx for multi-platform image builds.
@@ -77,19 +82,49 @@ jobs:
             -var="container_image=${{ steps.login-ecr.outputs.registry }}/ec2-legacy-app:${{ env.DEPLOY_SHA }}-${{ github.run_number }}" \
             -out=tfplan
 
+      - name: Upload plan for the apply job
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ec2-legacy-app/terraform-ecs/tfplan
+          retention-days: 1
+
+    # JOB 2 - waits for manual approval, then applies the saved plan
+    apply:
+      name: Apply and verify Terraform Plan
+      needs: plan
+      runs-on: ubuntu-latest
+      environment: Production # this is where the manual approval happens
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: ec2-legacy-app/terraform-ecs
+
+      - name: Configure the AWS credentials for the apply job
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ec2-legacy-app/terraform-ecs
+        run: terraform init
+
       - name: Terraform Apply
         working-directory: ec2-legacy-app/terraform-ecs
         run: terraform apply -auto-approve tfplan # auto approve so that worklfow can run w/out manual intervention.
         # In production, i will remove this and approve manually.
-
-      - name: Trigger ECS Service Deployment
-        run: |
-          aws --version
-          aws ecs update-service \
-            --cluster ec2-to-ecs-migration-production-cluster \
-            --service ec2-to-ecs-migration-app-service \
-            --force-new-deployment \
-            --region eu-west-2
 
       - name: Wait for ECS service to stabilise
         run: |
