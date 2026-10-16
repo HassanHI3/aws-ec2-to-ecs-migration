@@ -72,7 +72,7 @@ variable "ecs_memory" {
 variable "desired_count" {
   description = "Number of ECS tasks the service should run"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "domain_name" {
